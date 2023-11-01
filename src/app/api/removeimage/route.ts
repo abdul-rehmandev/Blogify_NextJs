@@ -9,7 +9,11 @@ cloudinary.v2.config({
 
 const removeImage = async (publicId: string) => {
     try {
-        await cloudinary.v2.uploader.destroy(publicId);
+        if (publicId) {
+            await cloudinary.v2.uploader.destroy(publicId);
+        } else {
+            console.log("There is no image related to this post")
+        }
     } catch (error) {
         console.log(error)
     }

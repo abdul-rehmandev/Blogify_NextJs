@@ -2,6 +2,7 @@ import prisma from "@/lib/prismadb";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "../auth/[...nextauth]/route";
+import nodemailer from "nodemailer"
 
 export async function POST(req: Request) {
 
@@ -27,6 +28,21 @@ export async function POST(req: Request) {
                 authorEmail
             }
         });
+
+        const transporter = nodemailer.createTransport({
+            service: "Gmail",
+            auth: {
+                user: process.env.NODEMAILER_EMAIL,
+                pass: process.env.NODEMAILER_PASSWORD
+            }
+        });
+
+        await transporter.sendMail({
+            from: "Blogify - Blogging beyond boundaries",
+            to: authorEmail,
+            subject: "Post Creation On Blogify",
+            html: `Hi ${session?.user?.name}, Congratulations on your new post : ${newPost.title}`
+        })
 
         return NextResponse.json({ message: "Post created", result: newPost }, { status: 201 })
     } catch (error) {
